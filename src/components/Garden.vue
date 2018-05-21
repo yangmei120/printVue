@@ -32,9 +32,10 @@
       </div>
     </div>
     <div class="list qrcode">
+      
       <ol>
         <li class="qr_one">园缴费码</li>
-        <li class="qr_down" @click.prevent ="down" ref="downLoad" id="downLoad">下载</li>
+        <li class="qr_down" @click ="down" ref="downLoad" id="downLoad">下载</li>
         <li class="qr_print" @click="doPrint">打印</li>
       </ol>
       <!--startprint-->
@@ -44,6 +45,9 @@
         <p>输入手机号学生姓名查询账单缴费</p>
         <vue-qr text="y2.bbtree.com" class="ddd"></vue-qr>
         <span>(智慧树新考勤学校)</span>
+        <div class="hide" id="hide">
+          隐藏
+        </div>
       </div>
       <!--endprint-->
     </div>
@@ -75,14 +79,16 @@
           this.$router.push({name:"collec"})
         },
         down(){
-          
-          html2canvas(document.querySelector('#qrcode_text')).then(canvas => {
+          //document.getElementById("hide").style.display = 'block';
+          html2canvas(document.querySelector('#qrcode_text'),
+           document.getElementById("hide").style.display = 'block').then(canvas => {
              let imgUri = canvas.toDataURL("image/png");
              let imgData = imgUri;
              this.downloadFile('测试.png', imgData);
+             document.getElementById("hide").style.display = 'none';
             //window.location.href= imgUri // 下载图片
           });
-
+         
         },
         downloadFile(fileName, content) {
           let aLink = document.createElement('a');
@@ -90,12 +96,11 @@
 
           //let evt = document.createEvent("HTMLEvents");
           //evt.initEvent("click", true, true);//initEvent 不加后两个参数在FF下会报错  事件类型，是否冒泡，是否阻止浏览器的默认行为
-          console.log(fileName)
           aLink.download = fileName;
           aLink.href = URL.createObjectURL(blob);
 
           // aLink.dispatchEvent(evt);
-          aLink.click()
+          aLink.click();
         },
         //base64转blob
         base64ToBlob(code) {
@@ -113,13 +118,20 @@
         }, 
         doPrint () {
           var newstr = document.getElementsByClassName('qrcode_text')[0].innerHTML
-          document.body.innerHTML = newstr
-          window.print()
+          document.body.innerHTML = newstr;
+          window.print();
           // 重新加载页面，以刷新数据
           window.location.reload()
+        },
+      },
+      data(){
+        return {
+          pageSize: 20,
+          currentPage: 1,
+          total: 0,
+          dataList: [],
+          loading: true,
         }
-
-
       }
   }
 </script>
@@ -136,6 +148,7 @@
     background:#f5f5f5;
     float:left;
     margin:2% 5%;
+    overflow: hidden;
   }
 .record h2,.collec h2{
   font-size: 30px;
@@ -228,6 +241,10 @@
     width: 200px;
     height: 200px;
   }
+  .hide{
+    display: none;
+    margin-top: 30px;
+  }
   @media print {
     body{
       text-align: center;
@@ -235,7 +252,11 @@
     .ddd{
       margin:0 auto;
     }
+    .hide{
+      display: block;
+    }
   }
+  
 </style>
 
 
